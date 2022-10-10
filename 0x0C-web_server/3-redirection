@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# A script that configures the nginx server to redirect to another page; YT
+# redirection shoul return 301 code(301 Moved Permanently)
+
+sudo apt-get -y update
+sudo apt-get -y install nginx
+sudo ufw allow 'Nginx HTTP'
+echo 'Hello World!' > /var/www/html/index.nginx-debian.html
+sed -i '/listen 80 default_server;/a rewrite ^/redirect_me https://www.youtube.com/watch?v=QH2-TGUlwu4 permanent;' /etc/nginx/sites-available/default
+sudo service nginx restart
+
