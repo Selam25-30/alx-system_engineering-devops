@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# connecting with the serve ubuntu via ssh-private
+sudo ssh -i ~/.ssh/school ubuntu@18.208.126.92
+
