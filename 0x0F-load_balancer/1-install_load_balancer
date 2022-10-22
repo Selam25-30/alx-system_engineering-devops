@@ -1,15 +1,22 @@
 #!/usr/bin/env bash
-# A script that configures HAproxy on lb-01 server.
-apt-get -y install --no-install-recommends software-properties-common
-add-apt-repository -y ppa:vbernat/haproxy-2.6
+# Configure server with: HAproxy version 1.5 or greater
+# Distributes request using roundrobin; sends traffic to servers: web-01 and web-02
+
+apt-get -y install software-properties-common
+add-apt-repository -y ppa:vbernat/haproxy-1.8
 apt-get -y update
-apt-get -y install haproxy=2.6.\*
-echo "frontend myfrontend
-	mode http
-	bind :80
-	default_backend myservers
-      backend myservers
-         balance roundrobin
-         server 3448-web-01 44.192.48.9
-	 server 3448-web-02 3.236.13.94" >> /etc/haproxy/haproxy.cfg
-service haproxy restart
+apt-get -y install haproxy=1.8.\*
+
+# Backup original config file before attempt modifications
+sudo cp /etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg.backup
+
+sed -i '/errorfile 504/a listen selam/etc/haproxy/haproxy.cfg
+sed -i '/listen selam/a         bind *:80' /etc/haproxy/haproxy.cfg
+sed -i '/bind *:80/a         mode http' /etc/haproxy/haproxy.cfg
+sed -i '/mode http/a        balance roundrobin' /etc/haproxy/haproxy.cfg
+sed -i '/balance roundrobin/a         server 23284-web-01 18.208.126.92:80 check' /etc/haproxy/haproxy.cfg
+sed -i '/server 23284-web-01 18.208.126.92:80 check/a         server 23284-web-02 3.236.12.198:80 check' /etc/haproxy/haproxy.cfg
+
+# Make sure HAproxy can be managed via an init script
+sed -i '/#EXTRAOPTS="-de -m 16"/a ENABLED=1' /etc/default/haproxy
+service haproxy start

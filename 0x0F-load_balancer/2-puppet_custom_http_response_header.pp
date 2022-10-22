@@ -1,38 +1,35 @@
-# A puppet manifest that installs nginx and custom HTTP header response
-
-exec { 'apt-update':
-  command  => '/usr/bin/apt-get update',
-  provider => shell,
+# puppet manifest creating a custom HTTP header response
+exec { 'apt-get-update':
+  command => '/usr/bin/apt-get update',
 }
 
 package { 'nginx':
-  ensure   => installed,
-  require  => Exec['apt-update'],
+  ensure  => installed,
+  require => Exec['apt-get-update'],
 }
 
-file_line { 'for redirection directive':
-  ensure   => 'present',
-  path     => '/etc/nginx/sites-available/default',
-  after    => 'listen on 80 default_server;',
-  line     => 'rewrite ^/redirect_me https://www.youtube.com/watch?v=QH2-TGUlwu4 permanent;',
-  require  => Package['nginx'],
+file_line { 'a':
+  ensure  => 'present',
+  path    => '/etc/nginx/sites-available/default',
+  after   => 'listen 80 default_server;',
+  line    => 'rewrite ^/redirect_me https://www.youtube.com/watch?v=QH2-TGUlwu4 permanent;',
+  require => Package['nginx'],
 }
 
-file_line { 'custom header line to add into the config file':
-  ensure   => 'present',
-  path     => '/etc/nginx/sites-available/default',
-  after    => 'listen on 80 default_server;',
-  line     => 'add_header X-served-By $hostname;',
-  require  => Package['nginx'],
+file_line { 'b':
+  ensure  => 'present',
+  path    => '/etc/nginx/sites-available/default',
+  after   => 'listen 80 default_server;',
+  line    => 'add_header X-Served-By $hostname;',
+  require => Package['nginx'],
 }
 
-file { '/var/www/html/index.nginx-debian.html':
-  ensure   => 'present',
-  content  => 'Hello World!',
-  require  => Package['nginx'],
+file { '/var/www/html/index.html':
+  content => 'Hello World!',
+  require => Package['nginx'],
 }
 
-exec { 'start nginx':
-  command  => '/usr/bin/sudo service nginx start',
-  provider => shell,
+service { 'nginx':
+  ensure  => running,
+  require => Package['nginx'],
 }
