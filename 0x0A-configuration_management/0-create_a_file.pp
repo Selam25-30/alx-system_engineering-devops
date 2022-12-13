@@ -1,9 +1,10 @@
-#Create file school
-file { 'school':
-  ensure  => 'present',
-  content => 'I love Puppet',
-  group   => 'www-data',
+# create file named school in tmp with below specification
+
+file { '/tmp/school':
+  ensure  => file,
+  path    => '/tmp/school',
   mode    => '0744',
   owner   => 'www-data',
-  path    => '/tmp/holberton',
+  group   => 'www-data',
+  content => 'I love Puppet'
 }
